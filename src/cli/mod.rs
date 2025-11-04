@@ -32,23 +32,29 @@ pub enum GenerateComponent {
         #[arg(short, long)]
         module: Option<String>,
         #[arg(long)]
-        crud: bool,
+        methods: Vec<String>,
+        #[arg(long)]
+        dependencies: Vec<String>,
     },
     /// Generate REST API routes
-    Routes { 
+    Route { 
         name: String, 
         #[arg(short, long)]
         methods: Vec<HttpMethod>, 
         #[arg(short, long)]
         path: String,
         #[arg(long)]
-        resource: Option<String>,
+        middleware: Vec<String>,
+        #[arg(long)]
+        service_dependency: Option<String>,
     },
-    /// Generate middleware
-    Middleware { 
+    /// Generate middleware/guard
+    Guard { 
         name: String, 
         #[arg(short, long)]
-        middleware_type: MiddlewareType 
+        guard_type: GuardType,
+        #[arg(long)]
+        validation_rules: Vec<String>,
     },
     /// Generate a complete web service module
     Module { 
@@ -56,9 +62,7 @@ pub enum GenerateComponent {
         #[arg(short, long)]
         components: Vec<ComponentType>,
         #[arg(long)]
-        with_auth: bool,
-        #[arg(long)]
-        with_crud: bool,
+        dependencies: Vec<String>,
     },
 }
 
@@ -120,7 +124,7 @@ impl std::str::FromStr for HttpMethod {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub enum MiddlewareType {
+pub enum GuardType {
     Auth,
     Jwt,
     Validation,
@@ -130,18 +134,18 @@ pub enum MiddlewareType {
     Custom(String),
 }
 
-impl std::str::FromStr for MiddlewareType {
+impl std::str::FromStr for GuardType {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            "auth" => Ok(MiddlewareType::Auth),
-            "jwt" => Ok(MiddlewareType::Jwt),
-            "validation" => Ok(MiddlewareType::Validation),
-            "ratelimit" | "rate-limit" => Ok(MiddlewareType::RateLimit),
-            "cors" => Ok(MiddlewareType::Cors),
-            "logging" => Ok(MiddlewareType::Logging),
-            _ => Ok(MiddlewareType::Custom(s.to_string())),
+            "auth" => Ok(GuardType::Auth),
+            "jwt" => Ok(GuardType::Jwt),
+            "validation" => Ok(GuardType::Validation),
+            "ratelimit" | "rate-limit" => Ok(GuardType::RateLimit),
+            "cors" => Ok(GuardType::Cors),
+            "logging" => Ok(GuardType::Logging),
+            _ => Ok(GuardType::Custom(s.to_string())),
         }
     }
 }

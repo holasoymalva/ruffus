@@ -1,15 +1,15 @@
 use super::{Generator, GenerationResult};
 use crate::error::GenerationError;
-use crate::cli::{Framework, MiddlewareType};
+use crate::cli::{Framework, GuardType};
 
-pub struct MiddlewareGenerator {
+pub struct GuardGenerator {
     // TODO: Add template engine and file system manager
 }
 
 #[derive(Debug)]
-pub struct MiddlewareGenerationRequest {
+pub struct GuardGenerationRequest {
     pub name: String,
-    pub middleware_type: MiddlewareType,
+    pub guard_type: GuardType,
     pub validation_rules: Vec<ValidationRule>,
 }
 
@@ -20,8 +20,8 @@ pub struct ValidationRule {
     pub parameters: Vec<String>,
 }
 
-impl Generator for MiddlewareGenerator {
-    type Request = MiddlewareGenerationRequest;
+impl Generator for GuardGenerator {
+    type Request = GuardGenerationRequest;
 
     async fn generate(&self, _request: Self::Request) -> Result<GenerationResult, GenerationError> {
         // TODO: Implement middleware generation
@@ -29,7 +29,7 @@ impl Generator for MiddlewareGenerator {
             files_created: vec![],
             files_modified: vec![],
             success: true,
-            message: "Middleware generation not yet implemented".to_string(),
+            message: "Guard generation not yet implemented".to_string(),
         })
     }
 

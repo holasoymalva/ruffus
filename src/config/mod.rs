@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use crate::cli::{Framework, ComponentType, HttpMethod, MiddlewareType};
+use crate::cli::{Framework, ComponentType, HttpMethod, GuardType};
 use crate::error::ConfigError;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -133,7 +133,7 @@ pub struct RouteGenerationRequest {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GuardGenerationRequest {
     pub name: String,
-    pub guard_type: MiddlewareType,
+    pub guard_type: GuardType,
     pub validation_rules: Vec<ValidationRule>,
 }
 
