@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Set up project structure and core dependencies
+- [x] 1. Set up project structure and core dependencies
   - Create Cargo.toml with necessary dependencies (clap, handlebars, serde, tokio, thiserror)
   - Set up basic project directory structure (src/cli, src/generators, src/templates, etc.)
   - Create main.rs with basic CLI entry point
@@ -128,7 +128,7 @@
 
 - [ ] 9. Implement configuration management system
   - [ ] 9.1 Create configuration loading and saving
-    - Implement ProjectConfig loading from .rweb.toml
+    - Implement ProjectConfig loading from .ruffus.toml
     - Create UserConfig loading from home directory
     - Add configuration validation and defaults
     - _Requirements: 6.1, 6.2_

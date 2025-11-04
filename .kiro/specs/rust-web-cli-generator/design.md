@@ -44,7 +44,7 @@ graph TB
 ```rust
 // Estructura principal de comandos
 #[derive(Parser)]
-#[command(name = "rweb")]
+#[command(name = "ruffus")]
 #[command(about = "Rust Web CLI Generator")]
 pub enum Commands {
     /// Initialize a new project
