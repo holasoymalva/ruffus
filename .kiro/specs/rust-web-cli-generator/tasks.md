@@ -31,7 +31,7 @@
     - Add argument parsing for names, paths, and options
     - _Requirements: 1.1, 2.1, 3.1, 4.1_
 
-  - [ ] 3.2 Create command handlers and routing
+  - [x] 3.2 Create command handlers and routing
     - Implement command dispatch logic in main.rs
     - Create handler functions for each command type
     - Add input validation for component names and paths
