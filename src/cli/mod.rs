@@ -30,27 +30,35 @@ pub enum GenerateComponent {
     Service { 
         name: String, 
         #[arg(short, long)]
-        module: Option<String> 
+        module: Option<String>,
+        #[arg(long)]
+        crud: bool,
     },
-    /// Generate a route
-    Route { 
+    /// Generate REST API routes
+    Routes { 
         name: String, 
         #[arg(short, long)]
         methods: Vec<HttpMethod>, 
         #[arg(short, long)]
-        path: String 
+        path: String,
+        #[arg(long)]
+        resource: Option<String>,
     },
-    /// Generate a guard/middleware
-    Guard { 
+    /// Generate middleware
+    Middleware { 
         name: String, 
         #[arg(short, long)]
-        guard_type: GuardType 
+        middleware_type: MiddlewareType 
     },
-    /// Generate a complete module
+    /// Generate a complete web service module
     Module { 
         name: String, 
         #[arg(short, long)]
-        components: Vec<ComponentType> 
+        components: Vec<ComponentType>,
+        #[arg(long)]
+        with_auth: bool,
+        #[arg(long)]
+        with_crud: bool,
     },
 }
 
@@ -112,22 +120,28 @@ impl std::str::FromStr for HttpMethod {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum GuardType {
+pub enum MiddlewareType {
     Auth,
+    Jwt,
     Validation,
     RateLimit,
+    Cors,
+    Logging,
     Custom(String),
 }
 
-impl std::str::FromStr for GuardType {
+impl std::str::FromStr for MiddlewareType {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            "auth" => Ok(GuardType::Auth),
-            "validation" => Ok(GuardType::Validation),
-            "ratelimit" | "rate-limit" => Ok(GuardType::RateLimit),
-            _ => Ok(GuardType::Custom(s.to_string())),
+            "auth" => Ok(MiddlewareType::Auth),
+            "jwt" => Ok(MiddlewareType::Jwt),
+            "validation" => Ok(MiddlewareType::Validation),
+            "ratelimit" | "rate-limit" => Ok(MiddlewareType::RateLimit),
+            "cors" => Ok(MiddlewareType::Cors),
+            "logging" => Ok(MiddlewareType::Logging),
+            _ => Ok(MiddlewareType::Custom(s.to_string())),
         }
     }
 }

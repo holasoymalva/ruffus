@@ -32,7 +32,7 @@ async fn run(commands: Commands) -> Result<(), CliError> {
             Ok(())
         }
         Commands::Generate { component } => {
-            println!("Generating component: {:?}", component);
+            println!("Generating web service component: {:?}", component);
             // TODO: Implement generate command
             Ok(())
         }
