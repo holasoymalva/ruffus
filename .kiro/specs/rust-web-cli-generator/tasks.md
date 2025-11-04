@@ -82,48 +82,55 @@
     - Add integration logic for main routing files
     - _Requirements: 1.4, 2.4, 4.4_
 
-- [ ] 7. Create code generators for each component type
-  - [ ] 7.1 Implement service generator
-    - Create ServiceGenerator with template rendering
-    - Add service file creation in correct module structure
-    - Implement automatic mod.rs updates for services
+- [ ] 7. Create web service generators for rapid development
+  - [ ] 7.1 Implement service layer generator
+    - Create business logic services with CRUD operations
+    - Generate service traits and implementations
+    - Add dependency injection patterns and error handling
+    - Implement automatic service registration
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-  - [ ] 7.2 Implement route generator
-    - Create RouteGenerator with HTTP method support
-    - Add route file creation with framework-specific patterns
-    - Implement automatic routing configuration updates
+  - [ ] 7.2 Implement REST API route generator
+    - Create HTTP endpoints with standard REST patterns
+    - Generate route handlers with request/response DTOs
+    - Add automatic OpenAPI/Swagger documentation
+    - Implement route registration and path parameters
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - [ ] 7.3 Implement guard generator
-    - Create GuardGenerator with middleware patterns
-    - Add guard file creation with validation logic
-    - Implement middleware integration for different frameworks
+  - [ ] 7.3 Implement middleware and guard generator
+    - Create authentication and authorization middleware
+    - Generate request validation and sanitization guards
+    - Add logging, CORS, and rate limiting middleware
+    - Implement custom middleware templates
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 7.4 Implement module generator
-    - Create ModuleGenerator that orchestrates other generators
-    - Add complete module structure creation
-    - Implement mod.rs generation and main integration
+  - [ ] 7.4 Implement complete web service module generator
+    - Generate full-featured web service modules
+    - Create integrated service + routes + middleware
+    - Add database models and migration templates
+    - Implement testing scaffolds and examples
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 8. Build framework-specific template implementations
-  - [ ] 8.1 Create Axum templates and patterns
-    - Implement service templates with Axum patterns
-    - Create route templates with axum::Router integration
-    - Add guard templates with axum middleware
+- [ ] 8. Build web service templates for popular frameworks
+  - [ ] 8.1 Create Axum web service templates
+    - Implement REST API service templates with async/await
+    - Create route handlers with extractors and responses
+    - Add middleware templates for auth, logging, CORS
+    - Generate application state and dependency injection
     - _Requirements: 5.3, 5.4_
 
-  - [ ] 8.2 Create Actix-web templates and patterns
-    - Implement service templates with Actix patterns
-    - Create route templates with actix_web::web integration
-    - Add guard templates with Actix middleware
+  - [ ] 8.2 Create Actix-web service templates
+    - Implement web service templates with Actix patterns
+    - Create route handlers with web::Json and web::Path
+    - Add middleware templates for Actix ecosystem
+    - Generate app configuration and service registration
     - _Requirements: 5.3, 5.4_
 
-  - [ ] 8.3 Create Warp templates and patterns
-    - Implement service templates with Warp patterns
-    - Create route templates with warp::Filter integration
-    - Add guard templates with Warp middleware
+  - [ ] 8.3 Create Warp and Rocket service templates
+    - Implement lightweight service templates for Warp
+    - Create Rocket route templates with guards and fairings
+    - Add framework-specific middleware patterns
+    - Generate server configuration and startup code
     - _Requirements: 5.3, 5.4_
 
 - [ ] 9. Implement configuration management system

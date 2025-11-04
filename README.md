@@ -5,16 +5,30 @@
 [![Build Status](https://img.shields.io/github/workflow/status/holasoymalva/ruffus/CI)](https://github.com/holasoymalva/ruffus/actions)
 [![Crates.io](https://img.shields.io/crates/v/ruffus.svg)](https://crates.io/crates/ruffus)
 
-**Ruffus** is a powerful CLI tool for generating web components in Rust projects. It provides scaffolding and code generation capabilities for popular Rust web frameworks like Axum, Actix-web, Warp, and Rocket.
+**Ruffus** is a Flask-inspired CLI scaffolding tool for Rust web services. It provides rapid code generation and project scaffolding for building REST APIs and web services with popular Rust frameworks like Axum, Actix-web, Warp, and Rocket. Think of it as the "rails generate" or "flask cli" for Rust backend development.
+
+## 🐍 Flask-Inspired Philosophy
+
+Just like Flask makes Python web development simple and productive, Ruffus brings that same philosophy to Rust:
+
+- **Convention over Configuration**: Sensible defaults that just work
+- **Rapid Prototyping**: Go from idea to running API in minutes
+- **Modular Design**: Generate only what you need, when you need it
+- **Developer Friendly**: Intuitive commands that feel natural
+- **Production Ready**: Generated code follows Rust best practices
 
 ## ✨ Features
 
-- 🚀 **Multi-Framework Support**: Works with Axum, Actix-web, Warp, Rocket, and custom frameworks
-- 🎯 **Smart Code Generation**: Generate services, routes, guards/middleware, and complete modules
-- 🔧 **Configurable Templates**: Customize templates or use built-in ones
-- 📁 **Project Structure**: Automatically organizes your code with best practices
-- ⚡ **Fast & Reliable**: Built with Rust for maximum performance
-- 🎨 **Template Engine**: Powered by Handlebars with custom helpers
+- 🚀 **Flask-like Simplicity**: Intuitive CLI commands for rapid web service development
+- 🎯 **REST API Scaffolding**: Generate complete CRUD services with one command
+- 🔧 **Multi-Framework**: Support for Axum, Actix-web, Warp, Rocket out of the box
+- 📁 **Clean Architecture**: Enforces service layer, routing, and middleware patterns
+- ⚡ **Zero Config**: Start building immediately with sensible defaults
+- 🎨 **Customizable Templates**: Extend with your own service patterns
+- 🔍 **Smart Detection**: Automatically adapts to your existing project structure
+- 📝 **Production Ready**: Generates idiomatic, testable, and maintainable code
+- 🛡️ **Security First**: Built-in templates for auth, validation, and CORS
+- 📊 **API Documentation**: Auto-generates OpenAPI/Swagger documentation
 
 ## 🚀 Quick Start
 
@@ -33,20 +47,20 @@ cargo install --path .
 ### Basic Usage
 
 ```bash
-# Initialize a new project
-ruffus init --framework axum --name my-web-app
+# Initialize a new web service project
+ruffus init --framework axum --name todo-api
 
-# Generate a service
-ruffus generate service UserService --module users
+# Generate a complete CRUD service
+ruffus generate service TodoService --crud --module todos
 
-# Generate a route with multiple HTTP methods
-ruffus generate route UserRoutes --methods GET,POST --path "/api/users"
+# Generate REST API endpoints
+ruffus generate routes TodoRoutes --resource todos --methods GET,POST,PUT,DELETE
 
-# Generate middleware/guard
-ruffus generate guard AuthGuard --guard-type auth
+# Generate authentication middleware
+ruffus generate middleware AuthMiddleware --type jwt
 
-# Generate a complete module
-ruffus generate module UserModule --components service,route,guard
+# Generate a complete web service module
+ruffus generate module UserModule --with-auth --with-crud
 ```
 
 ## 📖 Documentation
@@ -54,7 +68,7 @@ ruffus generate module UserModule --components service,route,guard
 ### Commands
 
 #### `ruffus init`
-Initialize a new web project with the specified framework.
+Initialize a new web backend project with the specified framework.
 
 ```bash
 ruffus init --framework <FRAMEWORK> --name <PROJECT_NAME>
@@ -65,7 +79,7 @@ ruffus init --framework <FRAMEWORK> --name <PROJECT_NAME>
 - `--name, -n`: Project name
 
 #### `ruffus generate`
-Generate components for your web application.
+Generate backend components for your web application.
 
 ##### Generate Service
 ```bash
@@ -113,20 +127,21 @@ ruffus config list
 
 ## 🏗️ Project Structure
 
-Ruffus organizes your project with a clean, scalable structure:
+Ruffus organizes your backend project with a clean, scalable structure:
 
 ```
-my-web-app/
+my-api/
 ├── src/
-│   ├── main.rs
+│   ├── main.rs          # Application entry point
 │   ├── routes/          # HTTP route handlers
-│   ├── services/        # Business logic services
-│   ├── guards/          # Middleware and guards
-│   ├── models/          # Data models
-│   └── config/          # Configuration
-├── templates/           # Custom templates (optional)
-├── .ruffus.toml        # Project configuration
-└── Cargo.toml
+│   ├── services/        # Business logic layer
+│   ├── guards/          # Middleware and authentication
+│   ├── models/          # Data models and DTOs
+│   ├── config/          # Application configuration
+│   └── lib.rs           # Library exports
+├── templates/           # Custom code templates (optional)
+├── .ruffus.toml        # Ruffus project configuration
+└── Cargo.toml          # Rust project manifest
 ```
 
 ## ⚙️ Configuration
@@ -136,7 +151,7 @@ my-web-app/
 ```toml
 [project]
 framework = "axum"
-name = "my-web-app"
+name = "my-api"
 author = "Your Name"
 
 [structure]
@@ -144,6 +159,10 @@ services_dir = "services"
 routes_dir = "routes"
 guards_dir = "guards"
 models_dir = "models"
+
+[generation]
+auto_format = true
+auto_imports = true
 
 [templates]
 custom_path = "./templates"
@@ -244,30 +263,48 @@ cargo test --test integration
 
 ## 📝 Examples
 
-### Axum Example
+### Building a Todo API with Axum
 
 ```bash
-# Initialize Axum project
+# Initialize new web service
 ruffus init --framework axum --name todo-api
+cd todo-api
 
-# Generate user service
-ruffus generate service UserService --module users
+# Generate complete todo service with CRUD operations
+ruffus generate service TodoService --crud --module todos
+# Creates: src/todos/service.rs with create, read, update, delete methods
 
-# Generate authentication middleware
-ruffus generate guard AuthGuard --guard-type auth
+# Generate REST API routes
+ruffus generate routes TodoRoutes --resource todos
+# Creates: src/todos/routes.rs with GET, POST, PUT, DELETE endpoints
 
-# Generate user routes
-ruffus generate route UserRoutes --path "/api/users" --methods GET,POST,PUT,DELETE
+# Generate JWT authentication middleware
+ruffus generate middleware AuthMiddleware --type jwt
+# Creates: src/middleware/auth.rs with JWT validation
+
+# Run your web service
+cargo run
 ```
 
-### Actix-web Example
+### Building a Blog API with Actix-web
 
 ```bash
-# Initialize Actix-web project
+# Initialize blog service
 ruffus init --framework actix-web --name blog-api
 
-# Generate complete blog module
-ruffus generate module BlogModule --components service,route,guard
+# Generate complete blog module with authentication
+ruffus generate module BlogModule --with-auth --with-crud
+# Creates complete blog service with posts, comments, and user auth
+
+# Generate admin routes
+ruffus generate routes AdminRoutes --path "/admin" --protected
+# Creates protected admin endpoints
+
+# Add rate limiting middleware
+ruffus generate middleware RateLimitMiddleware --type rate-limit
+
+# Generate API documentation routes
+ruffus generate route DocsRoutes --path "/docs" --methods GET
 ```
 
 ## 🗺️ Roadmap

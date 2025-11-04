@@ -2,7 +2,7 @@
 
 ## Overview
 
-El CLI generador de proyectos web para Rust será una herramienta de línea de comandos construida con Rust que automatiza la creación de componentes backend. La arquitectura seguirá un patrón modular con un sistema de plugins para soportar diferentes frameworks web, un motor de plantillas flexible y un sistema de configuración robusto.
+Ruffus es una herramienta CLI para scaffolding de web services en Rust, inspirada en la simplicidad y productividad de Flask para Python. Automatiza la creación de servicios, rutas, middleware y módulos completos para desarrollo backend, soportando múltiples frameworks web de Rust con plantillas optimizadas y mejores prácticas integradas.
 
 ## Architecture
 
@@ -30,12 +30,13 @@ graph TB
 
 ### Core Components
 
-1. **CLI Interface**: Punto de entrada principal usando `clap` para parsing de comandos
-2. **Framework Detector**: Analiza el proyecto existente para detectar el framework web usado
-3. **Template Engine**: Sistema basado en `handlebars` para generar código desde plantillas
-4. **Configuration Manager**: Maneja configuración del proyecto y del usuario
-5. **File System Manager**: Gestiona operaciones de archivos con validación y rollback
-6. **Code Generator**: Orquesta la generación de código usando plantillas y configuración
+1. **CLI Interface**: Interfaz de línea de comandos intuitiva para scaffolding rápido
+2. **Service Generator**: Genera capas de lógica de negocio con patrones establecidos
+3. **Route Generator**: Crea endpoints HTTP con routing automático
+4. **Guard Generator**: Genera middleware para autenticación, validación y logging
+5. **Module Generator**: Scaffolding completo de módulos con servicios, rutas y guards
+6. **Template Engine**: Sistema flexible de plantillas para diferentes frameworks web
+7. **Framework Adapter**: Detecta y adapta código para Axum, Actix-web, Warp, Rocket
 
 ## Components and Interfaces
 
