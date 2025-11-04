@@ -95,7 +95,7 @@ impl std::str::FromStr for Framework {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum HttpMethod {
     Get,
     Post,
@@ -119,7 +119,7 @@ impl std::str::FromStr for HttpMethod {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum MiddlewareType {
     Auth,
     Jwt,
@@ -146,7 +146,7 @@ impl std::str::FromStr for MiddlewareType {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum ComponentType {
     Service,
     Route,

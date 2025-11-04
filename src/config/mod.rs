@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use crate::cli::Framework;
+use crate::cli::{Framework, ComponentType, HttpMethod, MiddlewareType};
 use crate::error::ConfigError;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -108,4 +108,64 @@ impl Default for ConfigurationManager {
     fn default() -> Self {
         Self::new()
     }
+}
+
+// Generation Request Models
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ServiceGenerationRequest {
+    pub name: String,
+    pub module: Option<String>,
+    pub methods: Vec<String>,
+    pub dependencies: Vec<String>,
+    pub crud: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RouteGenerationRequest {
+    pub name: String,
+    pub path: String,
+    pub methods: Vec<HttpMethod>,
+    pub middleware: Vec<String>,
+    pub service_dependency: Option<String>,
+    pub resource: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GuardGenerationRequest {
+    pub name: String,
+    pub guard_type: MiddlewareType,
+    pub validation_rules: Vec<ValidationRule>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModuleGenerationRequest {
+    pub name: String,
+    pub components: Vec<ComponentRequest>,
+    pub dependencies: Vec<String>,
+    pub with_auth: bool,
+    pub with_crud: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ComponentRequest {
+    pub component_type: ComponentType,
+    pub name: String,
+    pub options: HashMap<String, String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValidationRule {
+    pub field: String,
+    pub rule_type: ValidationRuleType,
+    pub message: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ValidationRuleType {
+    Required,
+    MinLength(usize),
+    MaxLength(usize),
+    Email,
+    Numeric,
+    Custom(String),
 }

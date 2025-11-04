@@ -7,18 +7,18 @@
   - _Requirements: 5.2, 6.1_
 
 - [ ] 2. Implement core data models and error types
-  - [ ] 2.1 Create error type hierarchy with thiserror
+  - [x] 2.1 Create error type hierarchy with thiserror
     - Define CliError, GenerationError, TemplateError, FileSystemError enums
     - Implement Display and Error traits for all error types
     - _Requirements: 1.5, 2.3, 3.4_
 
-  - [ ] 2.2 Implement configuration data models
+  - [x] 2.2 Implement configuration data models
     - Create ProjectConfig and UserConfig structs with serde
     - Define Framework enum with supported web frameworks
     - Create ComponentType and GenerationRequest structs
     - _Requirements: 5.1, 5.3, 6.2_
 
-  - [ ] 2.3 Create template and context models
+  - [x] 2.3 Create template and context models
     - Implement Template struct with metadata
     - Create TemplateContext with dynamic variables
     - Define TemplateVariable for template validation
