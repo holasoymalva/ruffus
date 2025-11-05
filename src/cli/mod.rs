@@ -76,7 +76,7 @@ pub enum ConfigAction {
     List,
 }
 
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum Framework {
     Axum,
     ActixWeb,

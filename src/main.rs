@@ -7,6 +7,7 @@ mod templates;
 mod config;
 mod error;
 mod filesystem;
+mod detector;
 
 use cli::{Commands, GenerateComponent, ConfigAction, ComponentType, GuardType};
 use error::{CliError, GenerationError};

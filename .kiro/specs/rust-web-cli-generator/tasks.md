@@ -38,13 +38,13 @@
     - _Requirements: 1.3, 2.3, 3.3, 4.3_
 
 - [ ] 4. Implement framework detection system
-  - [ ] 4.1 Create framework detector trait and implementations
+  - [x] 4.1 Create framework detector trait and implementations
     - Define FrameworkDetector trait with detect method
     - Implement detectors for Axum, Actix-web, Warp, Rocket
     - Create ProjectAnalyzer that orchestrates detection
     - _Requirements: 5.1, 5.5_
 
-  - [ ] 4.2 Build Cargo.toml and file structure analysis
+  - [x] 4.2 Build Cargo.toml and file structure analysis
     - Parse Cargo.toml to identify framework dependencies
     - Analyze project structure patterns for each framework
     - Implement fallback detection using common import patterns
