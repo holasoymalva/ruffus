@@ -1,0 +1,22 @@
+# Rust build artifacts
+/target/
+Cargo.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test coverage
+*.profraw
+*.profdata
+
+# Documentation build
+/doc/
+
+# Backup files
+*.bak
+*.tmp

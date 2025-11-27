@@ -2,7 +2,7 @@
 
 This implementation plan outlines the tasks to build **Ruffus**, a fast, minimalist web framework for Rust inspired by Express.js.
 
-- [ ] 1. Set up project structure and dependencies
+- [x] 1. Set up project structure and dependencies
   - Create Cargo.toml with all required dependencies (tokio, hyper, serde, async-trait, bytes, http)
   - Add dev dependencies (quickcheck, quickcheck_macros)
   - Create module structure: lib.rs, app.rs, router.rs, request.rs, response.rs, middleware.rs, error.rs
