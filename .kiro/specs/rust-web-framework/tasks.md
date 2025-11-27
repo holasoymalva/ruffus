@@ -67,7 +67,7 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - **Property 12: All request headers are accessible**
   - **Validates: Requirements 3.4**
 
-- [ ] 5. Implement Response type
+- [x] 5. Implement Response type
   - Create Response struct with fields: status, headers, body
   - Implement new(), status(), header() builder methods
   - Implement json() method for automatic JSON serialization
@@ -75,19 +75,19 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - Implement conversion to hyper::Response
   - _Requirements: 1.4, 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 5.1 Write property test for JSON Content-Type header
+- [x] 5.1 Write property test for JSON Content-Type header
   - **Property 17: JSON responses include correct Content-Type**
   - **Validates: Requirements 5.2**
 
-- [ ] 5.2 Write property test for custom status codes
+- [x] 5.2 Write property test for custom status codes
   - **Property 18: Custom status codes are preserved**
   - **Validates: Requirements 5.3**
 
-- [ ] 5.3 Write property test for custom headers
+- [x] 5.3 Write property test for custom headers
   - **Property 19: Custom headers are included in response**
   - **Validates: Requirements 5.4**
 
-- [ ] 5.4 Write property test for serialization failures
+- [x] 5.4 Write property test for serialization failures
   - **Property 20: Serialization failures return 500**
   - **Validates: Requirements 5.5**
 
