@@ -24,7 +24,7 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - **Property 22: Unhandled errors return 500**
   - **Validates: Requirements 6.2**
 
-- [ ] 3. Implement HTTP Method enum
+- [x] 3. Implement HTTP Method enum
   - Define Method enum with variants (GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD)
   - Implement conversion from hyper::Method
   - Implement Display and comparison traits
