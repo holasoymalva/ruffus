@@ -56,4 +56,28 @@ impl Error {
             Error::Custom { status, .. } => *status,
         }
     }
+
+    /// Convert the error into an HTTP response
+    pub fn into_response(self) -> crate::Response {
+        use crate::Response;
+        
+        let status = self.status_code();
+        let message = self.to_string();
+        
+        // Create JSON error response
+        let error_json = serde_json::json!({
+            "error": {
+                "status": status.as_u16(),
+                "message": message,
+            }
+        });
+        
+        let body = serde_json::to_string(&error_json)
+            .unwrap_or_else(|_| r#"{"error":{"status":500,"message":"Internal server error"}}"#.to_string());
+        
+        Response::new()
+            .status(status)
+            .header("Content-Type", "application/json")
+            .body(body)
+    }
 }

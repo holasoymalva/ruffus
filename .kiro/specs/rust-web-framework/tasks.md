@@ -9,18 +9,18 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - Set up test directories: tests/unit/ and tests/property/
   - _Requirements: 1.1_
 
-- [ ] 2. Implement core error types
+- [x] 2. Implement core error types
   - Define Error enum with all error variants (RouteNotFound, MethodNotAllowed, BadRequest, etc.)
   - Implement Display and std::error::Error traits for Error type
   - Implement status_code() method to map errors to HTTP status codes
   - Implement into_response() method to convert errors to HTTP responses
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 2.1 Write property test for error conversion
+- [x] 2.1 Write property test for error conversion
   - **Property 21: Handler errors convert to HTTP responses**
   - **Validates: Requirements 6.1**
 
-- [ ] 2.2 Write property test for unhandled errors
+- [x] 2.2 Write property test for unhandled errors
   - **Property 22: Unhandled errors return 500**
   - **Validates: Requirements 6.2**
 

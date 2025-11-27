@@ -45,6 +45,12 @@ impl Response {
             body: Bytes::from(text),
         }
     }
+
+    /// Set the body
+    pub fn body(mut self, body: String) -> Self {
+        self.body = Bytes::from(body);
+        self
+    }
 }
 
 impl Default for Response {
