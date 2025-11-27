@@ -1,5 +1,7 @@
 // Property-based tests for Request handling
 
+use quickcheck::TestResult;
+use quickcheck_macros::quickcheck;
 use ruffus::Request;
 use bytes::Bytes;
 use http::{HeaderMap, Method, Uri};

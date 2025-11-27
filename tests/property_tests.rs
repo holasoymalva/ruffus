@@ -1,7 +1,13 @@
 //! Property-based tests for Ruffus
 
-mod property {
-    include!("property/error_properties.rs");
-    include!("property/request_properties.rs");
-    include!("property/response_properties.rs");
-}
+#[path = "property/error_properties.rs"]
+mod error_properties;
+
+#[path = "property/request_properties.rs"]
+mod request_properties;
+
+#[path = "property/response_properties.rs"]
+mod response_properties;
+
+#[path = "property/router_properties.rs"]
+mod router_properties;

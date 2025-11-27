@@ -18,6 +18,6 @@ pub use method::Method;
 pub use middleware::{Middleware, Next};
 pub use request::Request;
 pub use response::Response;
-pub use router::Router;
+pub use router::{PathPattern, Route, Router, Segment};
 
 pub type Result<T> = std::result::Result<T, Error>;

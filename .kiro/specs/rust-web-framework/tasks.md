@@ -91,7 +91,7 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - **Property 20: Serialization failures return 500**
   - **Validates: Requirements 5.5**
 
-- [ ] 6. Implement routing system
+- [x] 6. Implement routing system
   - Create PathPattern struct to represent route patterns with static and dynamic segments
   - Implement pattern parsing to extract parameter names from `:param` syntax
   - Implement pattern matching algorithm to match URLs against patterns
@@ -99,23 +99,23 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - Implement route matching logic that extracts path parameters
   - _Requirements: 1.2, 1.3, 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 6.1 Write property test for route registration
+- [x] 6.1 Write property test for route registration
   - **Property 2: Route registration is preserved**
   - **Validates: Requirements 1.2**
 
-- [ ] 6.2 Write property test for route matching
+- [x] 6.2 Write property test for route matching
   - **Property 3: Matching requests invoke handlers**
   - **Validates: Requirements 1.3**
 
-- [ ] 6.3 Write property test for HTTP method matching
+- [x] 6.3 Write property test for HTTP method matching
   - **Property 30: HTTP method matching is exclusive**
   - **Validates: Requirements 8.1, 8.2, 8.3, 8.4, 8.5**
 
-- [ ] 6.4 Write property test for 404 handling
+- [x] 6.4 Write property test for 404 handling
   - **Property 23: Non-existent routes return 404**
   - **Validates: Requirements 6.3**
 
-- [ ] 6.5 Write property test for 405 handling
+- [x] 6.5 Write property test for 405 handling
   - **Property 24: Wrong method returns 405**
   - **Validates: Requirements 6.4**
 

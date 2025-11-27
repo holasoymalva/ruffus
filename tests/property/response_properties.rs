@@ -1,5 +1,7 @@
 // Property-based tests for Response type
 
+use quickcheck::TestResult;
+use quickcheck_macros::quickcheck;
 use ruffus::Response;
 use serde::{Deserialize, Serialize};
 

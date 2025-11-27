@@ -59,6 +59,20 @@ impl fmt::Display for Method {
     }
 }
 
+impl From<Method> for http::Method {
+    fn from(method: Method) -> Self {
+        match method {
+            Method::GET => http::Method::GET,
+            Method::POST => http::Method::POST,
+            Method::PUT => http::Method::PUT,
+            Method::DELETE => http::Method::DELETE,
+            Method::PATCH => http::Method::PATCH,
+            Method::OPTIONS => http::Method::OPTIONS,
+            Method::HEAD => http::Method::HEAD,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
