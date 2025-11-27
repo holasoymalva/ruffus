@@ -1,4 +1,6 @@
-# Implementation Plan
+# Implementation Plan: Ruffus
+
+This implementation plan outlines the tasks to build **Ruffus**, a fast, minimalist web framework for Rust inspired by Express.js.
 
 - [ ] 1. Set up project structure and dependencies
   - Create Cargo.toml with all required dependencies (tokio, hyper, serde, async-trait, bytes, http)

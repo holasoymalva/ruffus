@@ -1,13 +1,13 @@
-# Design Document: Rust Web Framework
+# Design Document: Ruffus - Fast, Minimalist Web Framework for Rust
 
 ## Overview
 
-Este framework web para Rust proporciona una API ergonómica y expresiva inspirada en Express.js, permitiendo a los desarrolladores crear APIs web de manera rápida y simple. El framework aprovecha el sistema de tipos de Rust, async/await, y el ecosistema de Tokio para ofrecer alto rendimiento con garantías de seguridad en tiempo de compilación.
+**Ruffus** es un framework web rápido y minimalista para Rust que proporciona una API ergonómica y expresiva inspirada en Express.js, permitiendo a los desarrolladores crear APIs web de manera rápida y simple. Ruffus aprovecha el sistema de tipos de Rust, async/await, y el ecosistema de Tokio para ofrecer alto rendimiento con garantías de seguridad en tiempo de compilación.
 
-El diseño se centra en tres pilares fundamentales:
-1. **Ergonomía**: API fluida y expresiva similar a Express.js
-2. **Seguridad**: Aprovechamiento del sistema de tipos de Rust para prevenir errores comunes
-3. **Rendimiento**: Operaciones asíncronas eficientes con Tokio
+Ruffus se centra en tres pilares fundamentales:
+1. **Minimalismo y Velocidad**: API simple y directa que maximiza el rendimiento
+2. **Ergonomía**: API fluida y expresiva similar a Express.js
+3. **Seguridad**: Aprovechamiento del sistema de tipos de Rust para prevenir errores comunes
 
 ## Architecture
 
@@ -572,7 +572,7 @@ quickcheck_macros = "1.0"
 ### Basic Application
 
 ```rust
-use express_rs::{App, Request, Response};
+use ruffus::{App, Request, Response};
 
 #[tokio::main]
 async fn main() {
@@ -627,7 +627,7 @@ app.post("/users", |mut req: Request| async {
 ### With Middleware
 
 ```rust
-use express_rs::middleware::{Middleware, Next};
+use ruffus::middleware::{Middleware, Next};
 
 struct Logger;
 
