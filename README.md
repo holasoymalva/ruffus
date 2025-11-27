@@ -5,7 +5,7 @@
   [![Crates.io](https://img.shields.io/crates/v/ruffus.svg)](https://crates.io/crates/ruffus)
   [![Documentation](https://docs.rs/ruffus/badge.svg)](https://docs.rs/ruffus)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-  [![Build Status](https://img.shields.io/github/workflow/status/ruffus/ruffus/CI)](https://github.com/ruffus/ruffus/actions)
+  [![Build Status](https://img.shields.io/github/workflow/status/holasoymalva/ruffus/CI)](https://github.com/holasoymalva/ruffus/actions)
 </div>
 
 ---
@@ -250,7 +250,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 
 ```bash
 # Clone the repository
-git clone https://github.com/ruffus/ruffus.git
+git clone https://github.com/holasoymalva/ruffus.git
 cd ruffus
 
 # Run tests
@@ -318,7 +318,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 💬 Community
 
 - [Discord](https://discord.gg/ruffus) - Join our community
-- [GitHub Discussions](https://github.com/ruffus/ruffus/discussions) - Ask questions
+- [GitHub Discussions](https://github.com/holasoymalva/ruffus/discussions) - Ask questions
 - [Twitter](https://twitter.com/ruffus_rs) - Follow for updates
 
 ---
