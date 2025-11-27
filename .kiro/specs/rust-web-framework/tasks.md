@@ -30,7 +30,7 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - Implement Display and comparison traits
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 4. Implement Request type
+- [x] 4. Implement Request type
   - Create Request struct with fields: method, uri, headers, body, params, query, extensions
   - Implement method(), uri(), headers() accessor methods
   - Implement param() method to get path parameters
@@ -39,31 +39,31 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - Implement conversion from hyper::Request
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 4.1 Write property test for path parameter extraction
+- [x] 4.1 Write property test for path parameter extraction
   - **Property 6: Path parameters are extracted correctly**
   - **Validates: Requirements 2.1, 2.3**
 
-- [ ] 4.2 Write property test for multiple path parameters
+- [x] 4.2 Write property test for multiple path parameters
   - **Property 7: Multiple path parameters are all extracted**
   - **Validates: Requirements 2.2**
 
-- [ ] 4.3 Write property test for URL decoding
+- [x] 4.3 Write property test for URL decoding
   - **Property 8: URL decoding round-trip**
   - **Validates: Requirements 2.4**
 
-- [ ] 4.4 Write property test for query parameter parsing
+- [x] 4.4 Write property test for query parameter parsing
   - **Property 9: Query parameters are parsed completely**
   - **Validates: Requirements 3.1**
 
-- [ ] 4.5 Write property test for JSON deserialization
+- [x] 4.5 Write property test for JSON deserialization
   - **Property 10: JSON deserialization round-trip**
   - **Validates: Requirements 3.2, 5.1**
 
-- [ ] 4.6 Write property test for invalid JSON handling
+- [x] 4.6 Write property test for invalid JSON handling
   - **Property 11: Invalid JSON returns 400 error**
   - **Validates: Requirements 3.3**
 
-- [ ] 4.7 Write property test for header access
+- [x] 4.7 Write property test for header access
   - **Property 12: All request headers are accessible**
   - **Validates: Requirements 3.4**
 
