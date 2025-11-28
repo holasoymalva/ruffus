@@ -83,6 +83,8 @@ impl App {
 
     /// Handle an incoming request through the middleware pipeline and routing
     pub async fn handle_request(&self, mut req: Request) -> Result<Response> {
+        use crate::middleware::{Next};
+        
         let method = Method::from(req.method().clone());
         let path = req.uri().path().to_string();
 
@@ -98,13 +100,16 @@ impl App {
                 // No middleware, execute handler directly
                 route.handle(req).await
             } else {
-                // Create handler for this route
-                let response = route.handle(req).await;
+                // Create a handler that will execute the route
+                // We need to clone the handler function from the route
+                let handler_fn = route.handler_fn();
+                let handler = Arc::new(move |req: Request| {
+                    handler_fn(req)
+                });
                 
-                // For now, we'll execute middleware without the route handler
-                // This is a simplified implementation - full middleware integration
-                // will be done in task 10
-                response
+                // Execute middleware stack with the handler
+                let next = Next::new(self.middleware.clone(), Some(handler));
+                next.run(req).await
             }
         } else {
             // Check if path exists with different method
@@ -131,6 +136,78 @@ impl App {
     /// Get the middleware stack (for testing)
     pub fn middleware(&self) -> &[Arc<dyn Middleware>] {
         &self.middleware
+    }
+
+    /// Start the server and listen for incoming connections
+    pub async fn listen(self, addr: &str) -> Result<()> {
+        use hyper::server::conn::http1;
+        use hyper::service::service_fn;
+        use hyper_util::rt::TokioIo;
+        use tokio::net::TcpListener;
+
+        // Parse the address
+        let addr = addr.parse::<std::net::SocketAddr>()
+            .map_err(|e| Error::InternalServerError(format!("Invalid address: {}", e)))?;
+
+        // Bind to the address
+        let listener = TcpListener::bind(addr)
+            .await
+            .map_err(|e| Error::InternalServerError(format!("Failed to bind: {}", e)))?;
+
+        println!("Ruffus server listening on http://{}", addr);
+
+        // Wrap self in Arc for sharing across connections
+        let app = Arc::new(self);
+
+        // Accept connections in a loop
+        loop {
+            let (stream, _) = listener.accept()
+                .await
+                .map_err(|e| Error::InternalServerError(format!("Failed to accept connection: {}", e)))?;
+
+            let io = TokioIo::new(stream);
+            let app_clone = app.clone();
+
+            // Spawn a task to handle this connection
+            tokio::spawn(async move {
+                // Create a service function that handles requests
+                let service = service_fn(move |hyper_req: hyper::Request<hyper::body::Incoming>| {
+                    let app = app_clone.clone();
+                    async move {
+                        // Convert hyper request to our Request type
+                        let req = match Request::from_hyper(hyper_req).await {
+                            Ok(req) => req,
+                            Err(e) => {
+                                // Return error response
+                                let response: hyper::Response<http_body_util::Full<bytes::Bytes>> = 
+                                    e.into_response().into();
+                                return Ok::<_, hyper::Error>(response);
+                            }
+                        };
+
+                        // Handle the request through our pipeline
+                        let response = match app.handle_request(req).await {
+                            Ok(resp) => resp,
+                            Err(e) => e.into_response(),
+                        };
+
+                        // Convert our Response to hyper Response
+                        let hyper_response: hyper::Response<http_body_util::Full<bytes::Bytes>> = 
+                            response.into();
+                        
+                        Ok::<_, hyper::Error>(hyper_response)
+                    }
+                });
+
+                // Serve the connection
+                if let Err(err) = http1::Builder::new()
+                    .serve_connection(io, service)
+                    .await
+                {
+                    eprintln!("Error serving connection: {:?}", err);
+                }
+            });
+        }
     }
 }
 

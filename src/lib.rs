@@ -5,6 +5,7 @@
 
 pub mod app;
 pub mod error;
+pub mod extractors;
 pub mod method;
 pub mod middleware;
 pub mod request;
@@ -14,6 +15,7 @@ pub mod router;
 // Re-export main types for convenience
 pub use app::App;
 pub use error::Error;
+pub use extractors::{FromRequest, Json, Path, Query};
 pub use method::Method;
 pub use middleware::{Handler, Middleware, Next};
 pub use request::Request;
