@@ -66,6 +66,68 @@ impl Response {
         self
     }
 
+    /// Set the body from bytes
+    pub fn body_bytes(mut self, body: Bytes) -> Self {
+        self.body = body;
+        self
+    }
+
+    /// Create an HTML response
+    pub fn html(html: String) -> Self {
+        Self {
+            status: StatusCode::OK,
+            headers: HeaderMap::new(),
+            body: Bytes::from(html),
+        }
+        .header("Content-Type", "text/html; charset=utf-8")
+    }
+
+    /// Create a 404 Not Found response
+    pub fn not_found() -> Self {
+        Self {
+            status: StatusCode::NOT_FOUND,
+            headers: HeaderMap::new(),
+            body: Bytes::from("Not Found"),
+        }
+    }
+
+    /// Create a 400 Bad Request response
+    pub fn bad_request(message: String) -> Self {
+        Self {
+            status: StatusCode::BAD_REQUEST,
+            headers: HeaderMap::new(),
+            body: Bytes::from(message),
+        }
+    }
+
+    /// Create a 500 Internal Server Error response
+    pub fn internal_error(message: String) -> Self {
+        Self {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            headers: HeaderMap::new(),
+            body: Bytes::from(message),
+        }
+    }
+
+    /// Create a redirect response
+    pub fn redirect(location: &str) -> Self {
+        Self {
+            status: StatusCode::FOUND,
+            headers: HeaderMap::new(),
+            body: Bytes::new(),
+        }
+        .header("Location", location)
+    }
+
+    /// Create a 204 No Content response
+    pub fn no_content() -> Self {
+        Self {
+            status: StatusCode::NO_CONTENT,
+            headers: HeaderMap::new(),
+            body: Bytes::new(),
+        }
+    }
+
     /// Get the status code
     pub fn get_status(&self) -> StatusCode {
         self.status
