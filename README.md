@@ -12,7 +12,7 @@
 
 Ruffus is a web framework for Rust inspired by Express.js, designed to make building web APIs fast, simple, and enjoyable. With an ergonomic API and powerful async runtime, Ruffus lets you focus on building features, not fighting the framework.
 
-> **Status**: ✅ Ready for publication on crates.io | 🧪 107 tests passing (8 unit + 43 property-based + 56 doc tests)
+> **Status**: ✅ Published on crates.io | 🧪 107 tests passing (8 unit + 43 property-based + 56 doc tests)
 
 ```rust
 use ruffus::{App, Request, Response};
@@ -42,7 +42,7 @@ async fn main() {
 
 ## 📦 Installation
 
-> **Note**: Ruffus is ready to be published on crates.io. Once published, you can install it with:
+Add Ruffus to your `Cargo.toml`:
 
 ```toml
 [dependencies]
@@ -51,13 +51,12 @@ tokio = { version = "1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 ```
 
-For now, you can use it directly from the repository:
+Or install from the command line:
 
-```toml
-[dependencies]
-ruffus = { git = "https://github.com/holasoymalva/ruffus" }
-tokio = { version = "1", features = ["full"] }
-serde = { version = "1.0", features = ["derive"] }
+```bash
+cargo add ruffus
+cargo add tokio --features full
+cargo add serde --features derive
 ```
 
 ## 🚀 Quick Start
@@ -253,26 +252,16 @@ Response::new()
     .text("body");                // Builder pattern
 ```
 
-## 🚀 Publishing to crates.io
+## � PPublished on crates.io
 
-Ruffus is ready to be published! See [PUBLISHING.md](PUBLISHING.md) for detailed instructions.
-
-Quick publish:
+Ruffus is now available on [crates.io](https://crates.io/crates/ruffus)!
 
 ```bash
-# 1. Login to crates.io (first time only)
-cargo login
-
-# 2. Publish
-cargo publish
-
-# Or use the automated script
-./publish.sh
+cargo add ruffus
 ```
 
-For more details, check:
-- [READY_TO_PUBLISH.md](READY_TO_PUBLISH.md) - Complete publication guide
-- [PUBLISH_CHECKLIST.md](PUBLISH_CHECKLIST.md) - Step-by-step checklist
+For maintainers publishing updates, see:
+- [PUBLISHING.md](PUBLISHING.md) - Publication guide
 - [CHANGELOG.md](CHANGELOG.md) - Version history
 
 ## 🤝 Contributing
@@ -315,17 +304,6 @@ Ruffus has comprehensive test coverage:
 - **Property-Based Tests**: 43 tests using QuickCheck for correctness properties
 - **Documentation Tests**: 56 tests embedded in documentation
 - **Total**: 107 tests, all passing ✅
-
-## 🏆 Why Ruffus?
-
-| Feature | Ruffus | Actix-web | Rocket | Axum |
-|---------|--------|-----------|--------|------|
-| Express-like API | ✅ | ❌ | ❌ | ❌ |
-| Async/Await | ✅ | ✅ | ✅ | ✅ |
-| Type-safe extractors | ✅ | ✅ | ✅ | ✅ |
-| Minimal boilerplate | ✅ | ❌ | ⚠️ | ⚠️ |
-| Middleware system | ✅ | ✅ | ✅ | ✅ |
-| Learning curve | Low | Medium | Medium | Medium |
 
 ## 📊 Benchmarks
 
@@ -413,5 +391,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   <br><br>
   <sub>If you like Ruffus, give it a ⭐ on GitHub!</sub>
   <br>
-  <sub>Ready to publish on crates.io 🚀</sub>
+  <sub>Available on <a href="https://crates.io/crates/ruffus">crates.io</a> 🚀</sub>
 </div>
