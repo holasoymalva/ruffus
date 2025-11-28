@@ -1,9 +1,24 @@
 //! Error types for Ruffus
+//!
+//! This module defines the error types used throughout the framework.
 
 use http::StatusCode;
 use std::fmt;
 
-/// Main error type for Ruffus
+/// Main error type for Ruffus.
+///
+/// All errors in Ruffus can be converted to HTTP responses with appropriate
+/// status codes and error messages.
+///
+/// # Examples
+///
+/// ```
+/// use ruffus::{Error, Response};
+///
+/// let error = Error::BadRequest("Invalid input".to_string());
+/// let response = error.into_response();
+/// assert_eq!(response.get_status(), http::StatusCode::BAD_REQUEST);
+/// ```
 #[derive(Debug)]
 pub enum Error {
     /// Route not found (404)
@@ -44,7 +59,17 @@ impl fmt::Display for Error {
 impl std::error::Error for Error {}
 
 impl Error {
-    /// Get the HTTP status code for this error
+    /// Returns the HTTP status code for this error.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Error;
+    /// use http::StatusCode;
+    ///
+    /// let error = Error::RouteNotFound;
+    /// assert_eq!(error.status_code(), StatusCode::NOT_FOUND);
+    /// ```
     pub fn status_code(&self) -> StatusCode {
         match self {
             Error::RouteNotFound => StatusCode::NOT_FOUND,
@@ -57,7 +82,19 @@ impl Error {
         }
     }
 
-    /// Convert the error into an HTTP response
+    /// Converts the error into an HTTP response.
+    ///
+    /// The response includes a JSON body with error details and the appropriate
+    /// HTTP status code.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Error;
+    ///
+    /// let error = Error::BadRequest("Invalid data".to_string());
+    /// let response = error.into_response();
+    /// ```
     pub fn into_response(self) -> crate::Response {
         use crate::Response;
         

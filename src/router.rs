@@ -1,11 +1,38 @@
 //! Router for organizing routes with common prefixes
+//!
+//! The router module provides types for organizing routes into logical groups
+//! with shared prefixes and middleware.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! use ruffus::{Router, Request, Response};
+//!
+//! let mut api = Router::new("/api");
+//!
+//! api.get("/users", |_req: Request| async {
+//!     Ok(Response::text("Users list".to_string()))
+//! });
+//!
+//! api.post("/users", |mut req: Request| async move {
+//!     Ok(Response::text("User created".to_string()))
+//! });
+//! ```
 
 use crate::{Method, Middleware, Request, Response, Result};
 use std::collections::HashMap;
 use std::future::Future;
 use std::pin::Pin;
 
-/// Represents a segment in a path pattern
+/// Represents a segment in a path pattern.
+///
+/// Path patterns are composed of static segments (literal strings) and
+/// dynamic segments (parameters that can match any value).
+///
+/// # Examples
+///
+/// - `/users/123` contains two static segments: "users" and "123"
+/// - `/users/:id` contains one static segment "users" and one dynamic segment ":id"
 #[derive(Debug, Clone, PartialEq)]
 pub enum Segment {
     /// Static path segment (e.g., "users")
@@ -14,7 +41,18 @@ pub enum Segment {
     Dynamic(String),
 }
 
-/// Represents a parsed path pattern
+/// Represents a parsed path pattern with static and dynamic segments.
+///
+/// Path patterns support dynamic parameters using the `:param` syntax.
+///
+/// # Examples
+///
+/// ```
+/// use ruffus::PathPattern;
+///
+/// let pattern = PathPattern::parse("/users/:id/posts/:post_id");
+/// // This pattern will match paths like "/users/123/posts/456"
+/// ```
 #[derive(Debug, Clone)]
 pub struct PathPattern {
     segments: Vec<Segment>,
@@ -22,7 +60,17 @@ pub struct PathPattern {
 }
 
 impl PathPattern {
-    /// Parse a path pattern string into segments
+    /// Parses a path pattern string into segments.
+    ///
+    /// Segments starting with `:` are treated as dynamic parameters.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::PathPattern;
+    ///
+    /// let pattern = PathPattern::parse("/users/:id");
+    /// ```
     pub fn parse(pattern: &str) -> Self {
         let segments = pattern
             .split('/')
@@ -42,7 +90,20 @@ impl PathPattern {
         }
     }
 
-    /// Check if a path matches this pattern and extract parameters
+    /// Checks if a path matches this pattern and extracts parameter values.
+    ///
+    /// Returns `Some(params)` if the path matches, where `params` contains
+    /// the extracted parameter values. Returns `None` if the path doesn't match.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::PathPattern;
+    ///
+    /// let pattern = PathPattern::parse("/users/:id");
+    /// let params = pattern.matches("/users/123").unwrap();
+    /// assert_eq!(params.get("id"), Some(&"123".to_string()));
+    /// ```
     pub fn matches(&self, path: &str) -> Option<HashMap<String, String>> {
         let path_segments: Vec<&str> = path
             .split('/')
@@ -75,18 +136,39 @@ impl PathPattern {
         Some(params)
     }
 
-    /// Get the raw pattern string
+    /// Returns the raw pattern string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::PathPattern;
+    ///
+    /// let pattern = PathPattern::parse("/users/:id");
+    /// assert_eq!(pattern.raw(), "/users/:id");
+    /// ```
     pub fn raw(&self) -> &str {
         &self.raw
     }
 
-    /// Get the segments
+    /// Returns the parsed segments of the pattern.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::{PathPattern, Segment};
+    ///
+    /// let pattern = PathPattern::parse("/users/:id");
+    /// let segments = pattern.segments();
+    /// assert_eq!(segments.len(), 2);
+    /// ```
     pub fn segments(&self) -> &[Segment] {
         &self.segments
     }
 }
 
-/// Type alias for handler functions
+/// Type alias for handler functions.
+///
+/// Handlers are async functions that take a `Request` and return a `Result<Response>`.
 pub type HandlerFn = std::sync::Arc<
     dyn Fn(Request) -> Pin<Box<dyn Future<Output = Result<Response>> + Send>>
         + Send
@@ -94,7 +176,10 @@ pub type HandlerFn = std::sync::Arc<
         + 'static,
 >;
 
-/// Represents a single route with method, pattern, and handler
+/// Represents a single route with an HTTP method, path pattern, and handler.
+///
+/// Routes are typically created through the `App` or `Router` methods
+/// (e.g., `get()`, `post()`) rather than directly.
 pub struct Route {
     method: Method,
     pattern: PathPattern,
@@ -102,7 +187,9 @@ pub struct Route {
 }
 
 impl Route {
-    /// Create a new route
+    /// Creates a new route with the specified method, pattern, and handler.
+    ///
+    /// This is typically used internally by the framework.
     pub fn new<F, Fut>(method: Method, pattern: &str, handler: F) -> Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -119,17 +206,19 @@ impl Route {
         }
     }
 
-    /// Get the method
+    /// Returns the HTTP method for this route.
     pub fn method(&self) -> &Method {
         &self.method
     }
 
-    /// Get the pattern
+    /// Returns the path pattern for this route.
     pub fn pattern(&self) -> &PathPattern {
         &self.pattern
     }
 
-    /// Check if this route matches the request
+    /// Checks if this route matches the given method and path.
+    ///
+    /// Returns extracted parameters if the route matches, or `None` otherwise.
     pub fn matches(&self, method: &Method, path: &str) -> Option<HashMap<String, String>> {
         if self.method == *method {
             self.pattern.matches(path)
@@ -138,18 +227,39 @@ impl Route {
         }
     }
 
-    /// Execute the handler with the given request
+    /// Executes the route handler with the given request.
     pub async fn handle(&self, req: Request) -> Result<Response> {
         (self.handler)(req).await
     }
     
-    /// Get a clone of the handler function
+    /// Returns a clone of the handler function.
+    ///
+    /// This is used internally by the framework.
     pub fn handler_fn(&self) -> HandlerFn {
         self.handler.clone()
     }
 }
 
-/// Router for grouping routes with a common prefix
+/// Router for grouping routes with a common prefix.
+///
+/// Routers allow you to organize related routes together and apply
+/// middleware to specific groups of routes.
+///
+/// # Examples
+///
+/// ```no_run
+/// use ruffus::{Router, Request, Response};
+///
+/// let mut api = Router::new("/api");
+///
+/// api.get("/users", |_req: Request| async {
+///     Ok(Response::text("Users".to_string()))
+/// });
+///
+/// api.get("/posts", |_req: Request| async {
+///     Ok(Response::text("Posts".to_string()))
+/// });
+/// ```
 pub struct Router {
     prefix: String,
     routes: Vec<Route>,
@@ -157,7 +267,19 @@ pub struct Router {
 }
 
 impl Router {
-    /// Create a new Router with the given prefix
+    /// Creates a new Router with the given prefix.
+    ///
+    /// # Arguments
+    ///
+    /// * `prefix` - The path prefix for all routes in this router
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Router;
+    ///
+    /// let router = Router::new("/api");
+    /// ```
     pub fn new(prefix: &str) -> Self {
         Self {
             prefix: prefix.to_string(),
@@ -166,7 +288,9 @@ impl Router {
         }
     }
 
-    /// Register a GET route
+    /// Registers a GET route on this router.
+    ///
+    /// The route path will be prefixed with the router's prefix.
     pub fn get<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -177,7 +301,9 @@ impl Router {
         self
     }
 
-    /// Register a POST route
+    /// Registers a POST route on this router.
+    ///
+    /// The route path will be prefixed with the router's prefix.
     pub fn post<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -188,7 +314,9 @@ impl Router {
         self
     }
 
-    /// Register a PUT route
+    /// Registers a PUT route on this router.
+    ///
+    /// The route path will be prefixed with the router's prefix.
     pub fn put<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -199,7 +327,9 @@ impl Router {
         self
     }
 
-    /// Register a DELETE route
+    /// Registers a DELETE route on this router.
+    ///
+    /// The route path will be prefixed with the router's prefix.
     pub fn delete<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -210,7 +340,9 @@ impl Router {
         self
     }
 
-    /// Register a PATCH route
+    /// Registers a PATCH route on this router.
+    ///
+    /// The route path will be prefixed with the router's prefix.
     pub fn patch<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -221,18 +353,22 @@ impl Router {
         self
     }
 
-    /// Add middleware to this router
+    /// Adds middleware to this router.
+    ///
+    /// The middleware will only apply to routes registered on this router.
     pub fn use_middleware(&mut self, middleware: std::sync::Arc<dyn Middleware>) -> &mut Self {
         self.middleware.push(middleware);
         self
     }
 
-    /// Get all routes
+    /// Returns all routes registered on this router.
     pub fn routes(&self) -> &[Route] {
         &self.routes
     }
 
-    /// Find a matching route for the given method and path
+    /// Finds a matching route for the given method and path.
+    ///
+    /// Returns the route and extracted parameters if a match is found.
     pub fn find_route(&self, method: &Method, path: &str) -> Option<(&Route, HashMap<String, String>)> {
         for route in &self.routes {
             if let Some(params) = route.matches(method, path) {
@@ -242,14 +378,14 @@ impl Router {
         None
     }
 
-    /// Check if any route matches the path (regardless of method)
+    /// Checks if any route matches the path (regardless of HTTP method).
     pub fn path_exists(&self, path: &str) -> bool {
         self.routes.iter().any(|route| {
             route.pattern.matches(path).is_some()
         })
     }
 
-    /// Get allowed methods for a path
+    /// Returns the allowed HTTP methods for a given path.
     pub fn allowed_methods(&self, path: &str) -> Vec<Method> {
         self.routes
             .iter()
@@ -258,24 +394,42 @@ impl Router {
             .collect()
     }
 
-    /// Get the prefix of this router
+    /// Returns the prefix of this router.
     pub fn prefix(&self) -> &str {
         &self.prefix
     }
 
-    /// Get the middleware stack
+    /// Returns the middleware stack for this router.
     pub fn middleware(&self) -> &[std::sync::Arc<dyn Middleware>] {
         &self.middleware
     }
 
-    /// Collect all routes with their full paths (for mounting)
+    /// Collects all routes with their full paths.
+    ///
+    /// This is used internally when mounting routers.
     pub fn collect_routes(self) -> Vec<Route> {
         self.routes
     }
 
-    /// Mount another router by merging its routes
-    /// The mounted router's routes will have the mount prefix prepended
-    /// The mounting router's own prefix is also prepended to all routes
+    /// Mounts another router by merging its routes.
+    ///
+    /// The mounted router's routes will have the mount prefix prepended.
+    /// The mounting router's own prefix is also prepended to all routes.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use ruffus::{Router, Request, Response};
+    /// let mut main_router = Router::new("/api");
+    /// let mut sub_router = Router::new("/v1");
+    ///
+    /// sub_router.get("/users", |_req: Request| async {
+    ///     Ok(Response::text("Users".to_string()))
+    /// });
+    ///
+    /// main_router.mount("", sub_router);
+    /// // Route is now at /api/v1/users
+    /// ```
     pub fn mount(&mut self, mount_prefix: &str, mut router: Router) -> &mut Self {
         // Add each route with both the router's prefix and mount prefix prepended
         for route in router.routes.drain(..) {

@@ -1,10 +1,35 @@
 //! HTTP Response type
+//!
+//! This module provides the [`Response`] type for building HTTP responses.
 
 use bytes::Bytes;
 use http::{HeaderMap, StatusCode};
 use serde::Serialize;
 
-/// Represents an outgoing HTTP response
+/// Represents an outgoing HTTP response.
+///
+/// The `Response` type provides a builder-style API for constructing HTTP responses
+/// with status codes, headers, and bodies.
+///
+/// # Examples
+///
+/// ```
+/// use ruffus::Response;
+///
+/// // Plain text response
+/// let response = Response::text("Hello, World!".to_string());
+///
+/// // JSON response
+/// let json_response = Response::json(&serde_json::json!({
+///     "message": "Success"
+/// })).unwrap();
+///
+/// // Custom response with status and headers
+/// let custom = Response::new()
+///     .status(http::StatusCode::CREATED)
+///     .header("X-Custom-Header", "value")
+///     .body("Created".to_string());
+/// ```
 pub struct Response {
     status: StatusCode,
     headers: HeaderMap,
@@ -12,7 +37,15 @@ pub struct Response {
 }
 
 impl Response {
-    /// Create a new empty Response
+    /// Creates a new empty Response with status 200 OK.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::new();
+    /// ```
     pub fn new() -> Self {
         Self {
             status: StatusCode::OK,
@@ -21,13 +54,34 @@ impl Response {
         }
     }
 
-    /// Set the status code
+    /// Sets the HTTP status code.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    /// use http::StatusCode;
+    ///
+    /// let response = Response::new()
+    ///     .status(StatusCode::CREATED)
+    ///     .body("Created".to_string());
+    /// ```
     pub fn status(mut self, status: StatusCode) -> Self {
         self.status = status;
         self
     }
 
-    /// Add a header
+    /// Adds a header to the response.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::new()
+    ///     .header("Content-Type", "text/plain")
+    ///     .header("X-Custom", "value");
+    /// ```
     pub fn header(mut self, key: &str, value: &str) -> Self {
         if let (Ok(name), Ok(val)) = (
             http::header::HeaderName::from_bytes(key.as_bytes()),
@@ -38,7 +92,15 @@ impl Response {
         self
     }
 
-    /// Create a plain text response
+    /// Creates a plain text response with status 200 OK.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::text("Hello, World!".to_string());
+    /// ```
     pub fn text(text: String) -> Self {
         Self {
             status: StatusCode::OK,
@@ -47,7 +109,29 @@ impl Response {
         }
     }
 
-    /// Create a JSON response from a serializable value
+    /// Creates a JSON response from a serializable value.
+    ///
+    /// Automatically sets the `Content-Type` header to `application/json`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the value cannot be serialized to JSON.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    /// use serde::Serialize;
+    ///
+    /// #[derive(Serialize)]
+    /// struct User {
+    ///     id: u64,
+    ///     name: String,
+    /// }
+    ///
+    /// let user = User { id: 1, name: "Alice".to_string() };
+    /// let response = Response::json(&user).unwrap();
+    /// ```
     pub fn json<T: Serialize>(value: &T) -> crate::Result<Self> {
         let json_string = serde_json::to_string(value)
             .map_err(crate::Error::JsonSerializeError)?;
@@ -60,19 +144,46 @@ impl Response {
         .header("Content-Type", "application/json"))
     }
 
-    /// Set the body
+    /// Sets the response body from a string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::new()
+    ///     .body("Hello, World!".to_string());
+    /// ```
     pub fn body(mut self, body: String) -> Self {
         self.body = Bytes::from(body);
         self
     }
 
-    /// Set the body from bytes
+    /// Sets the response body from bytes.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    /// use bytes::Bytes;
+    ///
+    /// let response = Response::new()
+    ///     .body_bytes(Bytes::from("Hello"));
+    /// ```
     pub fn body_bytes(mut self, body: Bytes) -> Self {
         self.body = body;
         self
     }
 
-    /// Create an HTML response
+    /// Creates an HTML response with the appropriate Content-Type header.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::html("<h1>Hello</h1>".to_string());
+    /// ```
     pub fn html(html: String) -> Self {
         Self {
             status: StatusCode::OK,
@@ -82,7 +193,15 @@ impl Response {
         .header("Content-Type", "text/html; charset=utf-8")
     }
 
-    /// Create a 404 Not Found response
+    /// Creates a 404 Not Found response.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::not_found();
+    /// ```
     pub fn not_found() -> Self {
         Self {
             status: StatusCode::NOT_FOUND,
@@ -91,7 +210,15 @@ impl Response {
         }
     }
 
-    /// Create a 400 Bad Request response
+    /// Creates a 400 Bad Request response with a custom message.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::bad_request("Invalid input".to_string());
+    /// ```
     pub fn bad_request(message: String) -> Self {
         Self {
             status: StatusCode::BAD_REQUEST,
@@ -100,7 +227,15 @@ impl Response {
         }
     }
 
-    /// Create a 500 Internal Server Error response
+    /// Creates a 500 Internal Server Error response with a custom message.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::internal_error("Database error".to_string());
+    /// ```
     pub fn internal_error(message: String) -> Self {
         Self {
             status: StatusCode::INTERNAL_SERVER_ERROR,
@@ -109,7 +244,15 @@ impl Response {
         }
     }
 
-    /// Create a redirect response
+    /// Creates a 302 redirect response to the specified location.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::redirect("/login");
+    /// ```
     pub fn redirect(location: &str) -> Self {
         Self {
             status: StatusCode::FOUND,
@@ -119,7 +262,15 @@ impl Response {
         .header("Location", location)
     }
 
-    /// Create a 204 No Content response
+    /// Creates a 204 No Content response.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::no_content();
+    /// ```
     pub fn no_content() -> Self {
         Self {
             status: StatusCode::NO_CONTENT,
@@ -128,17 +279,45 @@ impl Response {
         }
     }
 
-    /// Get the status code
+    /// Returns the HTTP status code of the response.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    /// use http::StatusCode;
+    ///
+    /// let response = Response::new().status(StatusCode::CREATED);
+    /// assert_eq!(response.get_status(), StatusCode::CREATED);
+    /// ```
     pub fn get_status(&self) -> StatusCode {
         self.status
     }
 
-    /// Get the headers
+    /// Returns the response headers.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::new().header("X-Custom", "value");
+    /// let headers = response.get_headers();
+    /// ```
     pub fn get_headers(&self) -> &HeaderMap {
         &self.headers
     }
 
-    /// Get the body
+    /// Returns the response body as bytes.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::Response;
+    ///
+    /// let response = Response::text("Hello".to_string());
+    /// let body = response.get_body();
+    /// ```
     pub fn get_body(&self) -> &Bytes {
         &self.body
     }

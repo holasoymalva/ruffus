@@ -1,17 +1,70 @@
 //! Application type - the main entry point for Ruffus
+//!
+//! The [`App`] struct is the core of a Ruffus application. It manages routing,
+//! middleware, and the HTTP server lifecycle.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! use ruffus::{App, Request, Response};
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     let mut app = App::new();
+//!     
+//!     app.get("/", |_req: Request| async {
+//!         Ok(Response::text("Hello, World!".to_string()))
+//!     });
+//!     
+//!     app.listen("127.0.0.1:3000").await.unwrap();
+//! }
+//! ```
 
 use crate::{Error, Method, Middleware, Request, Response, Result, Router};
 use std::future::Future;
 use std::sync::Arc;
 
-/// The main application struct
+/// The main application struct that manages routing, middleware, and server lifecycle.
+///
+/// `App` provides methods for:
+/// - Registering routes with HTTP methods (GET, POST, PUT, DELETE, PATCH)
+/// - Adding global middleware
+/// - Mounting routers with prefixes
+/// - Starting the HTTP server
+///
+/// # Examples
+///
+/// Basic usage:
+///
+/// ```no_run
+/// use ruffus::{App, Request, Response};
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let mut app = App::new();
+///     
+///     app.get("/hello", |_req: Request| async {
+///         Ok(Response::text("Hello!".to_string()))
+///     });
+///     
+///     app.listen("127.0.0.1:3000").await.unwrap();
+/// }
+/// ```
 pub struct App {
     router: Router,
     middleware: Vec<Arc<dyn Middleware>>,
 }
 
 impl App {
-    /// Create a new Application instance
+    /// Creates a new Application instance with an empty router and middleware stack.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ruffus::App;
+    ///
+    /// let app = App::new();
+    /// ```
     pub fn new() -> Self {
         Self {
             router: Router::new(""),
@@ -19,7 +72,22 @@ impl App {
         }
     }
 
-    /// Register a GET route
+    /// Registers a GET route with the specified path and handler.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The route pattern (e.g., "/users/:id")
+    /// * `handler` - An async function that handles the request
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use ruffus::{App, Request, Response};
+    /// # let mut app = App::new();
+    /// app.get("/users", |_req: Request| async {
+    ///     Ok(Response::text("List of users".to_string()))
+    /// });
+    /// ```
     pub fn get<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -29,7 +97,23 @@ impl App {
         self
     }
 
-    /// Register a POST route
+    /// Registers a POST route with the specified path and handler.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The route pattern (e.g., "/users")
+    /// * `handler` - An async function that handles the request
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use ruffus::{App, Request, Response};
+    /// # let mut app = App::new();
+    /// app.post("/users", |mut req: Request| async move {
+    ///     // Handle user creation
+    ///     Ok(Response::text("User created".to_string()))
+    /// });
+    /// ```
     pub fn post<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -39,7 +123,12 @@ impl App {
         self
     }
 
-    /// Register a PUT route
+    /// Registers a PUT route with the specified path and handler.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The route pattern (e.g., "/users/:id")
+    /// * `handler` - An async function that handles the request
     pub fn put<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -49,7 +138,12 @@ impl App {
         self
     }
 
-    /// Register a DELETE route
+    /// Registers a DELETE route with the specified path and handler.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The route pattern (e.g., "/users/:id")
+    /// * `handler` - An async function that handles the request
     pub fn delete<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -59,7 +153,12 @@ impl App {
         self
     }
 
-    /// Register a PATCH route
+    /// Registers a PATCH route with the specified path and handler.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The route pattern (e.g., "/users/:id")
+    /// * `handler` - An async function that handles the request
     pub fn patch<F, Fut>(&mut self, path: &str, handler: F) -> &mut Self
     where
         F: Fn(Request) -> Fut + Send + Sync + 'static,
@@ -69,19 +168,76 @@ impl App {
         self
     }
 
-    /// Add global middleware
+    /// Adds global middleware that will be executed for all requests.
+    ///
+    /// Middleware is executed in the order it is registered.
+    ///
+    /// # Arguments
+    ///
+    /// * `middleware` - An Arc-wrapped middleware implementation
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use ruffus::{App, Middleware, Request, Response, Next};
+    /// # use async_trait::async_trait;
+    /// # use std::sync::Arc;
+    /// #
+    /// struct Logger;
+    ///
+    /// #[async_trait]
+    /// impl Middleware for Logger {
+    ///     async fn handle(&self, req: Request, next: Next) -> ruffus::Result<Response> {
+    ///         println!("{} {}", req.method(), req.uri());
+    ///         next.run(req).await
+    ///     }
+    /// }
+    ///
+    /// # let mut app = App::new();
+    /// app.use_middleware(Arc::new(Logger));
+    /// ```
     pub fn use_middleware(&mut self, middleware: Arc<dyn Middleware>) -> &mut Self {
         self.middleware.push(middleware);
         self
     }
 
-    /// Mount a router at a specific prefix
+    /// Mounts a router at the specified prefix.
+    ///
+    /// All routes from the mounted router will be prefixed with the given path.
+    ///
+    /// # Arguments
+    ///
+    /// * `prefix` - The path prefix for all routes in the router
+    /// * `router` - The router to mount
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use ruffus::{App, Router, Request, Response};
+    /// # let mut app = App::new();
+    /// let mut api = Router::new("/v1");
+    /// api.get("/users", |_req: Request| async {
+    ///     Ok(Response::text("Users".to_string()))
+    /// });
+    ///
+    /// app.mount("/api", api);
+    /// // Route is now available at /api/v1/users
+    /// ```
     pub fn mount(&mut self, prefix: &str, router: Router) -> &mut Self {
         self.router.mount(prefix, router);
         self
     }
 
-    /// Handle an incoming request through the middleware pipeline and routing
+    /// Handles an incoming request through the middleware pipeline and routing.
+    ///
+    /// This method:
+    /// 1. Finds a matching route for the request
+    /// 2. Extracts path parameters
+    /// 3. Executes the middleware stack
+    /// 4. Invokes the route handler
+    ///
+    /// Returns a 404 error if no route matches, or a 405 error if the path exists
+    /// but the HTTP method doesn't match.
     pub async fn handle_request(&self, mut req: Request) -> Result<Response> {
         use crate::middleware::{Next};
         
@@ -138,7 +294,32 @@ impl App {
         &self.middleware
     }
 
-    /// Start the server and listen for incoming connections
+    /// Starts the HTTP server and listens for incoming connections.
+    ///
+    /// This method consumes the `App` and runs indefinitely, handling requests
+    /// as they arrive. Each connection is handled in a separate Tokio task.
+    ///
+    /// # Arguments
+    ///
+    /// * `addr` - The address to bind to (e.g., "127.0.0.1:3000")
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The address is invalid
+    /// - The server fails to bind to the address
+    /// - A connection handling error occurs
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use ruffus::App;
+    /// # #[tokio::main]
+    /// # async fn main() {
+    /// let app = App::new();
+    /// app.listen("127.0.0.1:3000").await.unwrap();
+    /// # }
+    /// ```
     pub async fn listen(self, addr: &str) -> Result<()> {
         use hyper::server::conn::http1;
         use hyper::service::service_fn;
