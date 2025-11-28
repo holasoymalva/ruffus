@@ -9,6 +9,7 @@ Cargo.lock
 *.swo
 *~
 .DS_Store
+.kiro/
 
 # Test coverage
 *.profraw
