@@ -87,7 +87,7 @@ impl PathPattern {
 }
 
 /// Type alias for handler functions
-pub type HandlerFn = Box<
+pub type HandlerFn = std::sync::Arc<
     dyn Fn(Request) -> Pin<Box<dyn Future<Output = Result<Response>> + Send>>
         + Send
         + Sync
@@ -108,7 +108,7 @@ impl Route {
         F: Fn(Request) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = Result<Response>> + Send + 'static,
     {
-        let handler_fn = Box::new(move |req: Request| {
+        let handler_fn = std::sync::Arc::new(move |req: Request| {
             Box::pin(handler(req)) as Pin<Box<dyn Future<Output = Result<Response>> + Send>>
         });
 
@@ -141,6 +141,11 @@ impl Route {
     /// Execute the handler with the given request
     pub async fn handle(&self, req: Request) -> Result<Response> {
         (self.handler)(req).await
+    }
+    
+    /// Get a clone of the handler function
+    pub fn handler_fn(&self) -> HandlerFn {
+        self.handler.clone()
     }
 }
 
