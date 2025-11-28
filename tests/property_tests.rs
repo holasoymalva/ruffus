@@ -17,3 +17,6 @@ mod router_properties;
 
 #[path = "property/middleware_properties.rs"]
 mod middleware_properties;
+
+#[path = "property/extractor_properties.rs"]
+mod extractor_properties;
