@@ -1,7 +1,6 @@
 //! Router for organizing routes with common prefixes
 
 use crate::{Method, Middleware, Request, Response, Result};
-use async_trait::async_trait;
 use std::collections::HashMap;
 use std::future::Future;
 use std::pin::Pin;
@@ -149,7 +148,7 @@ impl Route {
 pub struct Router {
     prefix: String,
     routes: Vec<Route>,
-    middleware: Vec<Box<dyn Middleware>>,
+    middleware: Vec<std::sync::Arc<dyn Middleware>>,
 }
 
 impl Router {
@@ -218,7 +217,7 @@ impl Router {
     }
 
     /// Add middleware to this router
-    pub fn use_middleware(&mut self, middleware: Box<dyn Middleware>) -> &mut Self {
+    pub fn use_middleware(&mut self, middleware: std::sync::Arc<dyn Middleware>) -> &mut Self {
         self.middleware.push(middleware);
         self
     }
@@ -260,7 +259,7 @@ impl Router {
     }
 
     /// Get the middleware stack
-    pub fn middleware(&self) -> &[Box<dyn Middleware>] {
+    pub fn middleware(&self) -> &[std::sync::Arc<dyn Middleware>] {
         &self.middleware
     }
 

@@ -504,7 +504,7 @@ fn prop_router_middleware_scopes(
     
     // Create router1 with middleware
     let mut router1 = Router::new(&router1_prefix.0);
-    router1.use_middleware(Box::new(TestMiddleware));
+    router1.use_middleware(std::sync::Arc::new(TestMiddleware));
     match method {
         Method::GET => router1.get(&path.pattern, |_req| async { Ok(Response::new()) }),
         Method::POST => router1.post(&path.pattern, |_req| async { Ok(Response::new()) }),

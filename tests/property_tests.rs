@@ -1,5 +1,8 @@
 //! Property-based tests for Ruffus
 
+#[path = "property/app_properties.rs"]
+mod app_properties;
+
 #[path = "property/error_properties.rs"]
 mod error_properties;
 
