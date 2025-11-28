@@ -11,3 +11,6 @@ mod response_properties;
 
 #[path = "property/router_properties.rs"]
 mod router_properties;
+
+#[path = "property/middleware_properties.rs"]
+mod middleware_properties;

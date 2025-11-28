@@ -15,7 +15,7 @@ pub mod router;
 pub use app::App;
 pub use error::Error;
 pub use method::Method;
-pub use middleware::{Middleware, Next};
+pub use middleware::{Handler, Middleware, Next};
 pub use request::Request;
 pub use response::Response;
 pub use router::{PathPattern, Route, Router, Segment};

@@ -119,7 +119,7 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - **Property 24: Wrong method returns 405**
   - **Validates: Requirements 6.4**
 
-- [ ] 7. Implement Handler trait and middleware system
+- [x] 7. Implement Handler trait and middleware system
   - Define Handler trait with async handle method
   - Implement Handler for async closures and functions
   - Define Middleware trait with async handle method
@@ -127,27 +127,27 @@ This implementation plan outlines the tasks to build **Ruffus**, a fast, minimal
   - Implement middleware stack execution logic
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 9.2_
 
-- [ ] 7.1 Write property test for middleware order preservation
+- [x] 7.1 Write property test for middleware order preservation
   - **Property 13: Middleware registration order is preserved**
   - **Validates: Requirements 4.1**
 
-- [ ] 7.2 Write property test for middleware execution order
+- [x] 7.2 Write property test for middleware execution order
   - **Property 14: Middleware executes in order**
   - **Validates: Requirements 4.2, 4.5**
 
-- [ ] 7.3 Write property test for request modification propagation
+- [x] 7.3 Write property test for request modification propagation
   - **Property 15: Request modifications propagate through chain**
   - **Validates: Requirements 4.3**
 
-- [ ] 7.4 Write property test for early middleware return
+- [x] 7.4 Write property test for early middleware return
   - **Property 16: Early middleware return skips remaining chain**
   - **Validates: Requirements 4.4**
 
-- [ ] 7.5 Write property test for error middleware
+- [x] 7.5 Write property test for error middleware
   - **Property 25: Error middleware handles all errors**
   - **Validates: Requirements 6.5**
 
-- [ ] 7.6 Write property test for handler types
+- [x] 7.6 Write property test for handler types
   - **Property 31: Various handler types are accepted**
   - **Validates: Requirements 9.2**
 
