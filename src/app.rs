@@ -16,6 +16,22 @@ impl App {
             middleware: Vec::new(),
         }
     }
+
+    /// Mount a router at a specific prefix
+    pub fn mount(&mut self, prefix: &str, router: Router) -> &mut Self {
+        self.router.mount(prefix, router);
+        self
+    }
+
+    /// Get the internal router (for testing)
+    pub fn router(&self) -> &Router {
+        &self.router
+    }
+
+    /// Get mutable access to the internal router
+    pub fn router_mut(&mut self) -> &mut Router {
+        &mut self.router
+    }
 }
 
 impl Default for App {

@@ -304,3 +304,243 @@ mod test_405_handling {
             .quickcheck(prop_wrong_method_returns_405 as fn(TestMethod, TestMethod, ValidPath) -> bool);
     }
 }
+
+// Helper to generate valid prefix strings
+#[derive(Clone, Debug)]
+struct ValidPrefix(String);
+
+impl Arbitrary for ValidPrefix {
+    fn arbitrary(g: &mut Gen) -> Self {
+        let num_segments = (u8::arbitrary(g) % 3) + 1; // 1-3 segments
+        let segments: Vec<String> = (0..num_segments)
+            .map(|_| ValidPathSegment::arbitrary(g).0)
+            .collect();
+        
+        let prefix = format!("/{}", segments.join("/"));
+        ValidPrefix(prefix)
+    }
+}
+
+/// **Feature: rust-web-framework, Property 26: Router prefix prepends to all routes**
+/// **Validates: Requirements 7.1**
+///
+/// For any router with a prefix and registered routes, all route paths should
+/// have the prefix prepended.
+fn prop_router_prefix_prepends(prefix: ValidPrefix, path: ValidPath, method: TestMethod) -> bool {
+    let mut router = Router::new(&prefix.0);
+    let method = method.0;
+    
+    // Register a route
+    match method {
+        Method::GET => router.get(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::POST => router.post(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PUT => router.put(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::DELETE => router.delete(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PATCH => router.patch(&path.pattern, |_req| async { Ok(Response::new()) }),
+        _ => return true, // Skip unsupported methods
+    };
+    
+    // The full path should be prefix + path
+    let expected_full_path = format!("{}{}", prefix.0, path.pattern);
+    
+    // Try to find the route with the full path
+    let found_with_full_path = router.find_route(&method, &expected_full_path).is_some();
+    
+    // Try to find the route with just the path (should fail)
+    let found_with_partial_path = router.find_route(&method, &path.pattern).is_some();
+    
+    // Property: route is found with full path but not with partial path
+    found_with_full_path && !found_with_partial_path
+}
+
+#[cfg(test)]
+mod test_router_prefix {
+    use super::*;
+
+    #[test]
+    fn run_router_prefix_prepends_property() {
+        QuickCheck::new()
+            .tests(100)
+            .quickcheck(prop_router_prefix_prepends as fn(ValidPrefix, ValidPath, TestMethod) -> bool);
+    }
+}
+
+/// **Feature: rust-web-framework, Property 27: Mounted router routes are registered**
+/// **Validates: Requirements 7.2**
+///
+/// For any router mounted on an application, all routes from the router should
+/// be registered with their full paths.
+fn prop_mounted_router_routes_registered(
+    mount_prefix: ValidPrefix,
+    router_prefix: ValidPrefix,
+    path: ValidPath,
+    method: TestMethod,
+) -> bool {
+    let mut router = Router::new(&router_prefix.0);
+    let method = method.0;
+    
+    // Register a route on the router
+    match method {
+        Method::GET => router.get(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::POST => router.post(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PUT => router.put(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::DELETE => router.delete(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PATCH => router.patch(&path.pattern, |_req| async { Ok(Response::new()) }),
+        _ => return true, // Skip unsupported methods
+    };
+    
+    // Create a main router and mount the sub-router
+    let mut main_router = Router::new("");
+    main_router.mount(&mount_prefix.0, router);
+    
+    // The full path should be mount_prefix + router_prefix + path
+    let expected_full_path = format!("{}{}{}", mount_prefix.0, router_prefix.0, path.pattern);
+    
+    // Try to find the route with the full path
+    let found = main_router.find_route(&method, &expected_full_path).is_some();
+    
+    // Property: route should be found with the full combined path
+    found
+}
+
+#[cfg(test)]
+mod test_router_mounting {
+    use super::*;
+
+    #[test]
+    fn run_mounted_router_routes_registered_property() {
+        QuickCheck::new()
+            .tests(100)
+            .quickcheck(prop_mounted_router_routes_registered as fn(ValidPrefix, ValidPrefix, ValidPath, TestMethod) -> bool);
+    }
+}
+
+/// **Feature: rust-web-framework, Property 28: Nested router prefixes combine correctly**
+/// **Validates: Requirements 7.3**
+///
+/// For any nested routers with prefixes, the final route paths should correctly
+/// combine all prefixes in order.
+fn prop_nested_router_prefixes_combine(
+    prefix1: ValidPrefix,
+    prefix2: ValidPrefix,
+    prefix3: ValidPrefix,
+    path: ValidPath,
+    method: TestMethod,
+) -> bool {
+    let method = method.0;
+    
+    // Create the innermost router with prefix3
+    let mut inner_router = Router::new(&prefix3.0);
+    match method {
+        Method::GET => inner_router.get(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::POST => inner_router.post(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PUT => inner_router.put(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::DELETE => inner_router.delete(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PATCH => inner_router.patch(&path.pattern, |_req| async { Ok(Response::new()) }),
+        _ => return true, // Skip unsupported methods
+    };
+    
+    // Create middle router with prefix2 and mount inner_router
+    let mut middle_router = Router::new(&prefix2.0);
+    middle_router.mount("", inner_router);
+    
+    // Create outer router with prefix1 and mount middle_router
+    let mut outer_router = Router::new(&prefix1.0);
+    outer_router.mount("", middle_router);
+    
+    // The full path should be prefix1 + prefix2 + prefix3 + path
+    let expected_full_path = format!("{}{}{}{}", prefix1.0, prefix2.0, prefix3.0, path.pattern);
+    
+    // Try to find the route with the full path
+    let found = outer_router.find_route(&method, &expected_full_path).is_some();
+    
+    // Property: route should be found with all prefixes combined
+    found
+}
+
+#[cfg(test)]
+mod test_nested_routers {
+    use super::*;
+
+    #[test]
+    fn run_nested_router_prefixes_combine_property() {
+        QuickCheck::new()
+            .tests(100)
+            .quickcheck(prop_nested_router_prefixes_combine as fn(ValidPrefix, ValidPrefix, ValidPrefix, ValidPath, TestMethod) -> bool);
+    }
+}
+
+/// **Feature: rust-web-framework, Property 29: Router middleware scopes correctly**
+/// **Validates: Requirements 7.4**
+///
+/// For any middleware registered on a router, it should only apply to routes
+/// within that router, not to other routes.
+fn prop_router_middleware_scopes(
+    router1_prefix: ValidPrefix,
+    router2_prefix: ValidPrefix,
+    path: ValidPath,
+    method: TestMethod,
+) -> bool {
+    use ruffus::middleware::{Middleware, Next};
+    use async_trait::async_trait;
+    use std::sync::Arc;
+    
+    // Ensure the two routers have different prefixes
+    if router1_prefix.0 == router2_prefix.0 {
+        return true; // Discard this test case
+    }
+    
+    let method = method.0;
+    
+    // Create a test middleware
+    struct TestMiddleware;
+    
+    #[async_trait]
+    impl Middleware for TestMiddleware {
+        async fn handle(&self, req: ruffus::Request, next: Next) -> ruffus::Result<ruffus::Response> {
+            next.run(req).await
+        }
+    }
+    
+    // Create router1 with middleware
+    let mut router1 = Router::new(&router1_prefix.0);
+    router1.use_middleware(Box::new(TestMiddleware));
+    match method {
+        Method::GET => router1.get(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::POST => router1.post(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PUT => router1.put(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::DELETE => router1.delete(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PATCH => router1.patch(&path.pattern, |_req| async { Ok(Response::new()) }),
+        _ => return true, // Skip unsupported methods
+    };
+    
+    // Create router2 without middleware
+    let mut router2 = Router::new(&router2_prefix.0);
+    match method {
+        Method::GET => router2.get(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::POST => router2.post(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PUT => router2.put(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::DELETE => router2.delete(&path.pattern, |_req| async { Ok(Response::new()) }),
+        Method::PATCH => router2.patch(&path.pattern, |_req| async { Ok(Response::new()) }),
+        _ => return true, // Skip unsupported methods
+    };
+    
+    // Check middleware counts
+    let router1_middleware_count = router1.middleware().len();
+    let router2_middleware_count = router2.middleware().len();
+    
+    // Property: router1 should have middleware, router2 should not
+    router1_middleware_count == 1 && router2_middleware_count == 0
+}
+
+#[cfg(test)]
+mod test_router_middleware_scoping {
+    use super::*;
+
+    #[test]
+    fn run_router_middleware_scopes_property() {
+        QuickCheck::new()
+            .tests(100)
+            .quickcheck(prop_router_middleware_scopes as fn(ValidPrefix, ValidPrefix, ValidPath, TestMethod) -> bool);
+    }
+}

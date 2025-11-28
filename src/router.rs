@@ -253,4 +253,60 @@ impl Router {
             .map(|route| *route.method())
             .collect()
     }
+
+    /// Get the prefix of this router
+    pub fn prefix(&self) -> &str {
+        &self.prefix
+    }
+
+    /// Get the middleware stack
+    pub fn middleware(&self) -> &[Box<dyn Middleware>] {
+        &self.middleware
+    }
+
+    /// Collect all routes with their full paths (for mounting)
+    pub fn collect_routes(self) -> Vec<Route> {
+        self.routes
+    }
+
+    /// Mount another router by merging its routes
+    /// The mounted router's routes will have the mount prefix prepended
+    /// The mounting router's own prefix is also prepended to all routes
+    pub fn mount(&mut self, mount_prefix: &str, mut router: Router) -> &mut Self {
+        // Add each route with both the router's prefix and mount prefix prepended
+        for route in router.routes.drain(..) {
+            // Combine: self.prefix + mount_prefix + existing route pattern
+            let combined_prefix = if self.prefix.is_empty() && mount_prefix.is_empty() {
+                String::new()
+            } else if self.prefix.is_empty() {
+                mount_prefix.to_string()
+            } else if mount_prefix.is_empty() {
+                self.prefix.clone()
+            } else {
+                format!("{}{}", self.prefix, mount_prefix)
+            };
+            
+            let new_pattern = if combined_prefix.is_empty() {
+                route.pattern.raw().to_string()
+            } else {
+                format!("{}{}", combined_prefix, route.pattern.raw())
+            };
+            
+            // Create a new route with the updated pattern
+            let new_route = Route {
+                method: route.method,
+                pattern: PathPattern::parse(&new_pattern),
+                handler: route.handler,
+            };
+            
+            self.routes.push(new_route);
+        }
+        
+        // Also merge middleware from the mounted router
+        for middleware in router.middleware.drain(..) {
+            self.middleware.push(middleware);
+        }
+        
+        self
+    }
 }
