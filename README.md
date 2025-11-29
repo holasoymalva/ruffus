@@ -387,7 +387,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-  <strong>Made with ❤️ and 🦀 by Martin Hernandez</strong>
+  <strong>Made with ❤️ and 🦀 by @holasoymalva</strong>
   <br><br>
   <sub>If you like Ruffus, give it a ⭐ on GitHub!</sub>
   <br>
