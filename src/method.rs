@@ -1,8 +1,21 @@
 //! HTTP Method type
+//!
+//! This module defines the HTTP methods supported by Ruffus.
 
 use std::fmt;
 
-/// HTTP request methods
+/// HTTP request methods.
+///
+/// Represents the standard HTTP methods used in RESTful APIs.
+///
+/// # Examples
+///
+/// ```
+/// use ruffus::Method;
+///
+/// let method = Method::GET;
+/// assert_eq!(method.to_string(), "GET");
+/// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Method {
     /// GET method
@@ -22,7 +35,9 @@ pub enum Method {
 }
 
 impl Method {
-    /// Convert from hyper/http Method
+    /// Converts from a hyper/http Method.
+    ///
+    /// Returns `None` if the method is not supported.
     pub fn from_hyper(method: &http::Method) -> Option<Self> {
         match *method {
             http::Method::GET => Some(Method::GET),
