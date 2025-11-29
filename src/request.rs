@@ -291,7 +291,7 @@ where
     type Error = crate::Error;
 
     fn try_from(req: hyper::Request<B>) -> Result<Self, Self::Error> {
-        let (parts, body) = req.into_parts();
+        let (_parts, _body) = req.into_parts();
         
         // We need to collect the body asynchronously, but this is a sync trait
         // This will be handled by the async conversion function below
